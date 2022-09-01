@@ -7,8 +7,14 @@
 
 import UIKit
 import SnapKit
+import RealmSwift
 
-class WriteViewController: UIViewController {
+class WriteViewController: UIViewController, UITextViewDelegate {
+    
+    let localRealm = try! Realm()
+    
+    var tasks: Results<MemoModel>!
+    
     
     var textView: UITextView = {
         let view = UITextView()
@@ -18,6 +24,11 @@ class WriteViewController: UIViewController {
     
     @objc func rightbarButtonItemClicked() {
         print(#function)
+        let task = MemoModel(title: textView.text, content: nil, date: Date())
+        try! localRealm.write {
+            localRealm.add(task)
+            print(task)
+        }
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -26,6 +37,7 @@ class WriteViewController: UIViewController {
         self.navigationItem.largeTitleDisplayMode = .always
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(rightbarButtonItemClicked))
         configureUI()
+        textView.delegate = self
     }
     
     func configureUI() {
@@ -38,7 +50,22 @@ class WriteViewController: UIViewController {
         }
     }
     
-    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if (text == "\n") {
+            textView.resignFirstResponder()
+            
+            let task = MemoModel(title: textView.text, content: nil, date: Date())
+            try! localRealm.write {
+                localRealm.add(task)
+                print(task)
+            }
+            
+            print(#function)
+        } else {
+             
+        }
+          return true
+    }
     
     
 }

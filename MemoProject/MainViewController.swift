@@ -7,8 +7,17 @@
 
 import UIKit
 import SnapKit
+import RealmSwift
 
 class ViewController: UIViewController {
+    
+    let localRealm = try! Realm()
+    
+    var tasks: Results<MemoModel>! {
+        didSet {
+            tableView.reloadData()
+        }
+    }
     
     var tableView: UITableView = {
 
@@ -48,6 +57,12 @@ class ViewController: UIViewController {
         tableView.delegate = self
         
         writeButton.addTarget(self, action: #selector(writeButtonClicked), for: .touchUpInside)
+        
+        self.tasks = self.localRealm.objects(MemoModel.self).sorted(byKeyPath: "date", ascending: false)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        tableView.reloadData()
     }
     
     @objc func writeButtonClicked() {
@@ -85,15 +100,13 @@ class ViewController: UIViewController {
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 1
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         let sectionName: String
         switch section {
         case 0:
-            sectionName = NSLocalizedString("고정된 메모", comment: "고정된 메모")
-        case 1:
             sectionName = NSLocalizedString("메모", comment: "메모")
         default:
             sectionName = ""
@@ -103,12 +116,15 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return tasks.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: MainTableViewCell.identifier) as! MainTableViewCell
+        let row = tasks[indexPath.row]
         cell.backgroundColor = .green
+        cell.memoTitle.text = row.title
+        cell.memoDate.text = "\(row.date)"
         return cell
     }
     
