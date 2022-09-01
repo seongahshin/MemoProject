@@ -6,3 +6,16 @@
 //
 
 import Foundation
+import UIKit
+
+class WriteViewController: UIViewController {
+    
+    override func viewDidLoad() {
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+        self.navigationItem.largeTitleDisplayMode = .always
+    }
+    
+    
+    
+    
+}

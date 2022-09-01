@@ -19,6 +19,18 @@ class ViewController: UIViewController {
         return view
     }()
     
+    var bottomView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black
+        return view
+    }()
+    
+    var writeButton: UIButton = {
+        let view = UIButton()
+        view.setImage(UIImage(systemName: "square.and.pencil"), for: .normal)
+        view.tintColor = .systemYellow
+        return view
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,22 +42,41 @@ class ViewController: UIViewController {
         self.navigationController?.navigationItem.title = "0개의 메모"
         self.navigationController?.navigationBar.backgroundColor = .red
         self.navigationItem.titleView = searchBar
+        
         configureUI()
         tableView.dataSource = self
         tableView.delegate = self
         
+        writeButton.addTarget(self, action: #selector(writeButtonClicked), for: .touchUpInside)
+    }
+    
+    @objc func writeButtonClicked() {
+        guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "WriteViewController") as? WriteViewController else { return }
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     func configureUI() {
 
-        [tableView].forEach {
+        [tableView, bottomView, writeButton].forEach {
             view.addSubview($0)
         }
+        
+        
 
         tableView.snp.makeConstraints { make in
             make.top.left.right.bottom.equalToSuperview()
         }
         
+        bottomView.snp.makeConstraints { make in
+            make.left.right.bottom.equalTo(0)
+            make.height.equalTo(100)
+        }
+        
+        writeButton.snp.makeConstraints { make in
+            make.bottom.equalTo(-75)
+            make.trailingMargin.equalTo(-2)
+            make.height.width.equalTo(20)
+        }
     }
 
 }
