@@ -132,5 +132,20 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         return 50
     }
     
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+
+        let delete = UIContextualAction(style: .normal, title: "") { [self] action, view, completionHandler in
+            completionHandler(true)
+            try! self.localRealm.write {
+                self.localRealm.delete(self.tasks[indexPath.row])
+                tableView.reloadData()
+            }
+        }
+        delete.image = UIImage(systemName: "trash")
+        delete.backgroundColor = .red
+        let config = UISwipeActionsConfiguration(actions: [delete])
+        return config
+    }
+    
 }
 
