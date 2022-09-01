@@ -51,7 +51,7 @@ class WriteViewController: UIViewController, UITextViewDelegate {
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        if (text == "\n") {
+        if (text == "\n\n") {
             textView.resignFirstResponder()
             
             let task = MemoModel(title: textView.text, content: nil, date: Date())
