@@ -122,9 +122,11 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: MainTableViewCell.identifier) as! MainTableViewCell
         let row = tasks[indexPath.row]
+
         cell.backgroundColor = .green
         cell.memoTitle.text = row.title
         cell.memoDate.text = "\(row.date)"
+        cell.memoText.text = "\(row.content)"
         return cell
     }
     

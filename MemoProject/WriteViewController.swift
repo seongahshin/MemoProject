@@ -24,7 +24,9 @@ class WriteViewController: UIViewController, UITextViewDelegate {
     
     @objc func rightbarButtonItemClicked() {
         print(#function)
-        let task = MemoModel(title: textView.text, content: nil, date: Date())
+        let result = textView.text.split(separator: "\n", maxSplits: 2)
+        
+        let task = MemoModel(title: "\(result[0])", content: "\(result[1])", date: Date())
         try! localRealm.write {
             localRealm.add(task)
             print(task)
@@ -48,23 +50,6 @@ class WriteViewController: UIViewController, UITextViewDelegate {
         textView.snp.makeConstraints { make in
             make.top.left.right.bottom.equalTo(0)
         }
-    }
-    
-    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        if (text == "\n\n") {
-            textView.resignFirstResponder()
-            
-            let task = MemoModel(title: textView.text, content: nil, date: Date())
-            try! localRealm.write {
-                localRealm.add(task)
-                print(task)
-            }
-            
-            print(#function)
-        } else {
-             
-        }
-          return true
     }
     
     
