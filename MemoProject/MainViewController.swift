@@ -19,6 +19,13 @@ class ViewController: UIViewController {
         }
     }
     
+    var favoriteTasks: Results<MemoModel>!{
+        didSet {
+            tableView.reloadData()
+        }
+    }
+
+    
     var tableView: UITableView = {
 
         let view = UITableView(frame: CGRect.zero, style: .insetGrouped)
@@ -58,7 +65,8 @@ class ViewController: UIViewController {
         
         writeButton.addTarget(self, action: #selector(writeButtonClicked), for: .touchUpInside)
         
-        self.tasks = self.localRealm.objects(MemoModel.self).sorted(byKeyPath: "date", ascending: false)
+        self.tasks = localRealm.objects(MemoModel.self).filter("pinned == false").sorted(byKeyPath: "date", ascending: false)
+        self.favoriteTasks = localRealm.objects(MemoModel.self).filter("pinned == true").sorted(byKeyPath: "date", ascending: false)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -84,14 +92,18 @@ class ViewController: UIViewController {
             
             // 개행 있을 경우
             else {
+                
+                let result = vc.textView.text.split(separator: "\n", maxSplits: 2)
                 title = String(vc.textView.text!.split(separator: "\n").first!)
-                content = String(vc.textView.text.dropFirst(title.count+1))
+                content = "\(result[1])"
+                
             }
             
-            let task = MemoModel(title: title, content: content, rawContent: vc.textView.text, date: Date())
+            let task = MemoModel(title: title, content: content, rawContent: vc.textView.text, date: Date(), pinned: false)
             
             try! self.localRealm.write {
                 self.localRealm.add(task)
+                print(task)
                 self.tableView.reloadData()
             }
         }
@@ -128,45 +140,97 @@ class ViewController: UIViewController {
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 2
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        let sectionName: String
-        switch section {
-        case 0:
-            sectionName = NSLocalizedString("메모", comment: "메모")
-        default:
-            sectionName = ""
+        if section == 0 {
+            return "고정된 메모"
+        } else {
+            return "메모"
         }
-        return sectionName
-        
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tasks.count
+        if section == 0 {
+
+            return localRealm.objects(MemoModel.self).filter("pinned == true").sorted(byKeyPath: "date", ascending: false).count
+            
+            
+        } else {
+            return tasks.count
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: MainTableViewCell.identifier) as! MainTableViewCell
-        let row = tasks[indexPath.row]
-        cell.backgroundColor = .green
-        cell.memoTitle.text = row.title
-        cell.memoDate.text = "\(row.date)"
-        cell.memoText.text = "\(row.content)"
-        return cell
+        
+        if indexPath.section == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: MainTableViewCell.identifier, for: indexPath) as! MainTableViewCell
+            cell.memoTitle.text = favoriteTasks[indexPath.row].title
+            cell.memoText.text = favoriteTasks[indexPath.row].content
+            cell.memoDate.text = "\(favoriteTasks[indexPath.row].date)"
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: MainTableViewCell.identifier, for: indexPath) as! MainTableViewCell
+            cell.memoTitle.text = tasks[indexPath.row].title
+            cell.memoText.text = tasks[indexPath.row].content
+            cell.memoDate.text = "\(tasks[indexPath.row].date)"
+            
+            return cell
+        }
+        
     }
+    
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
+    }
+    
+    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        if indexPath.section == 0 {
+            let favorite = UIContextualAction(style: .normal, title: "", handler: { action, view, completionHandler in
+                completionHandler(true)
+                let taskUpdate = self.favoriteTasks[indexPath.row]
+                try! self.localRealm.write {
+                    taskUpdate.pinned = !taskUpdate.pinned
+                    tableView.reloadData()
+                }
+                
+            })
+            favorite.backgroundColor = .systemOrange
+            favorite.image = UIImage(systemName: "pin.slash.fill")
+            return UISwipeActionsConfiguration(actions: [favorite])
+        } else {
+            let favorite = UIContextualAction(style: .normal, title: "", handler: { action, view, completionHandler in
+                completionHandler(true)
+                let taskUpdate = self.tasks[indexPath.row]
+                try! self.localRealm.write {
+                    taskUpdate.pinned = !taskUpdate.pinned
+                    tableView.reloadData()
+                }
+            })
+            favorite.backgroundColor = .systemOrange
+            favorite.image = UIImage(systemName: "pin.fill")
+            return UISwipeActionsConfiguration(actions: [favorite])
+        }
+        
+        
+        
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
 
         let delete = UIContextualAction(style: .normal, title: "") { [self] action, view, completionHandler in
             completionHandler(true)
+            
+            var row = tasks[indexPath.row]
+            if indexPath.section == 0 {
+                row = favoriteTasks[indexPath.row]
+            }
+            
             try! self.localRealm.write {
-                self.localRealm.delete(self.tasks[indexPath.row])
+                self.localRealm.delete(row)
                 tableView.reloadData()
             }
         }
@@ -179,8 +243,12 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         UserDefaults.standard.set(true, forKey: "Bool")
         guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "WriteViewController") as? WriteViewController else { return }
-//        vc.context = tasks[indexPath.row].rawContent
-        let taskUpdate = tasks[indexPath.row]
+        var taskUpdate = tasks[indexPath.row]
+        
+        if indexPath.section == 0 {
+            taskUpdate = favoriteTasks[indexPath.row]
+        }
+        
         vc.contextAll = taskUpdate.rawContent
         vc.backActionHandler = {
             
@@ -225,4 +293,5 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
 }
+
 

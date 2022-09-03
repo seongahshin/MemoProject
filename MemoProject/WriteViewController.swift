@@ -27,12 +27,6 @@ class WriteViewController: UIViewController, UITextViewDelegate {
     @objc func rightbarButtonItemClicked() {
         print(#function)
         
-//        let result = textView.text.split(separator: "\n", maxSplits: 2)
-//
-//        let task = MemoModel(title: "\(result[0])", content: "\(result[1])", rawContent: textView.text, date: Date())
-//        try! localRealm.write {
-//            localRealm.add(task)
-//        }
         self.navigationController?.popViewController(animated: true)
         
     }
