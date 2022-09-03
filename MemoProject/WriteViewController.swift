@@ -14,7 +14,9 @@ class WriteViewController: UIViewController, UITextViewDelegate {
     let localRealm = try! Realm()
     
     var tasks: Results<MemoModel>!
-    
+
+    var contextAll = ""
+    var backActionHandler: (() -> ())?
     
     var textView: UITextView = {
         let view = UITextView()
@@ -24,14 +26,15 @@ class WriteViewController: UIViewController, UITextViewDelegate {
     
     @objc func rightbarButtonItemClicked() {
         print(#function)
-        let result = textView.text.split(separator: "\n", maxSplits: 2)
         
-        let task = MemoModel(title: "\(result[0])", content: "\(result[1])", date: Date())
-        try! localRealm.write {
-            localRealm.add(task)
-            print(task)
-        }
+//        let result = textView.text.split(separator: "\n", maxSplits: 2)
+//
+//        let task = MemoModel(title: "\(result[0])", content: "\(result[1])", rawContent: textView.text, date: Date())
+//        try! localRealm.write {
+//            localRealm.add(task)
+//        }
         self.navigationController?.popViewController(animated: true)
+        
     }
     
     override func viewDidLoad() {
@@ -40,6 +43,11 @@ class WriteViewController: UIViewController, UITextViewDelegate {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(rightbarButtonItemClicked))
         configureUI()
         textView.delegate = self
+        textView.text = contextAll
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        backActionHandler?()
     }
     
     func configureUI() {

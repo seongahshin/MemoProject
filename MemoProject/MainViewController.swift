@@ -67,6 +67,34 @@ class ViewController: UIViewController {
     
     @objc func writeButtonClicked() {
         guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "WriteViewController") as? WriteViewController else { return }
+        
+        vc.backActionHandler = {
+            var title = ""
+            var content = ""
+            
+            // 공백일 경우
+            if vc.textView.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                return
+            }
+            
+            // 한 줄일 경우
+            else if !vc.textView.text!.contains("\n") {
+                title = vc.textView.text!
+            }
+            
+            // 개행 있을 경우
+            else {
+                title = String(vc.textView.text!.split(separator: "\n").first!)
+                content = String(vc.textView.text.dropFirst(title.count+1))
+            }
+            
+            let task = MemoModel(title: title, content: content, rawContent: vc.textView.text, date: Date())
+            
+            try! self.localRealm.write {
+                self.localRealm.add(task)
+                self.tableView.reloadData()
+            }
+        }
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -122,7 +150,6 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: MainTableViewCell.identifier) as! MainTableViewCell
         let row = tasks[indexPath.row]
-
         cell.backgroundColor = .green
         cell.memoTitle.text = row.title
         cell.memoDate.text = "\(row.date)"
@@ -147,6 +174,54 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         delete.backgroundColor = .red
         let config = UISwipeActionsConfiguration(actions: [delete])
         return config
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        UserDefaults.standard.set(true, forKey: "Bool")
+        guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "WriteViewController") as? WriteViewController else { return }
+//        vc.context = tasks[indexPath.row].rawContent
+        let taskUpdate = tasks[indexPath.row]
+        vc.contextAll = taskUpdate.rawContent
+        vc.backActionHandler = {
+            
+            var title = ""
+            var content = ""
+            
+            // 공백
+            if vc.textView.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                try! self.localRealm.write {
+                    self.localRealm.delete(taskUpdate)
+                    tableView.reloadData()
+                }
+            }
+            
+            // 수정했는데 같을 경우
+            else if taskUpdate.rawContent == vc.textView.text {
+                return
+            }
+            
+            // 한줄
+            else if !vc.textView.text!.contains("\n") {
+                title = vc.textView.text!
+            }
+            
+            // 개행
+            else {
+                title = String(vc.textView.text!.split(separator: "\n").first!)
+                content = String(vc.textView.text.dropFirst(title.count+1))
+            }
+            
+            try! self.localRealm.write {
+                taskUpdate.title = title
+                taskUpdate.content = content
+                taskUpdate.rawContent = vc.textView.text
+                taskUpdate.date = Date()
+                
+                self.tableView.reloadData()
+            }
+            
+        }
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
 }
