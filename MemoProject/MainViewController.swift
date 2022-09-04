@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import RealmSwift
+import Toast
 
 class ViewController: UIViewController {
     
@@ -89,6 +90,10 @@ class ViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         
+        memoCountTitle()
+    }
+    
+    func memoCountTitle() {
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         let memoCount = numberFormatter.string(for: self.localRealm.objects(MemoModel.self).count)!
@@ -111,6 +116,10 @@ class ViewController: UIViewController {
     }
     
     @objc func writeButtonClicked() {
+        
+    
+        let realm = try! Realm()
+        print(Realm.Configuration.defaultConfiguration.fileURL!)
 
         guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "WriteViewController") as? WriteViewController else { return }
         
@@ -279,12 +288,24 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         } else if indexPath.section == 1 {
             let favorite = UIContextualAction(style: .normal, title: "", handler: { [self] action, view, completionHandler in
                 completionHandler(true)
-                let taskUpdate = self.tasks[indexPath.row]
-                try! self.localRealm.write {
-                    taskUpdate.pinned = !taskUpdate.pinned
-                    print("task update: \(self.favoriteTasks)")
-                    tableView.reloadData()
+                
+                if favoriteTasks.count == 5 {
+                    self.view.makeToast("", duration: 1.5,
+                                        point: CGPoint(x: self.view.frame.size.width/2, y: self.view.frame.size.height/2),
+                                           title: "더이상 고정시킬 수 없어요",
+                                           image: nil,
+                                           style: .init(),
+                                           completion: nil)
+                    return
+                } else {
+                    let taskUpdate = self.tasks[indexPath.row]
+                    try! self.localRealm.write {
+                        taskUpdate.pinned = !taskUpdate.pinned
+                        print("task update: \(self.favoriteTasks)")
+                        tableView.reloadData()
+                    }
                 }
+               
             })
             favorite.backgroundColor = .systemOrange
             favorite.image = UIImage(systemName: "pin.fill")
@@ -335,6 +356,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "WriteViewController") as? WriteViewController else { return }
         var taskUpdate = tasks[indexPath.row]
         
+        // 여기서(고정된 메모)를 select하면 앱이 꺼지는데, 어떻게 해결해야할지를 모르겠어요 ...
         if indexPath.section == 0 {
             taskUpdate = isFiltering() ? allTasks[indexPath.row] : favoriteTasks[indexPath.row]
             print(favoriteTasks)
@@ -346,11 +368,21 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             var title = ""
             var content = ""
             
+            try! self.localRealm.write {
+                taskUpdate.title = title
+                taskUpdate.content = content
+                taskUpdate.rawContent = vc.textView.text
+                taskUpdate.date = Date()
+                
+                self.tableView.reloadData()
+            }
+            
             // 공백
             if vc.textView.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 try! self.localRealm.write {
                     self.localRealm.delete(taskUpdate)
                     tableView.reloadData()
+                    self.viewWillAppear(false)
                 }
             }
             
@@ -370,14 +402,6 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
                 content = String(vc.textView.text.dropFirst(title.count+1))
             }
             
-            try! self.localRealm.write {
-                taskUpdate.title = title
-                taskUpdate.content = content
-                taskUpdate.rawContent = vc.textView.text
-                taskUpdate.date = Date()
-                
-                self.tableView.reloadData()
-            }
             
         }
         self.navigationController?.pushViewController(vc, animated: true)
