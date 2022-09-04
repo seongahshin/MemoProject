@@ -20,7 +20,8 @@ class WriteViewController: UIViewController, UITextViewDelegate {
     
     var textView: UITextView = {
         let view = UITextView()
-      
+        view.font = UIFont.systemFont(ofSize: 17)
+        view.textContainerInset = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15)
         return view
     }()
     
@@ -52,11 +53,14 @@ class WriteViewController: UIViewController, UITextViewDelegate {
         configureUI()
         textView.delegate = self
         textView.text = contextAll
+        textView.becomeFirstResponder()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         backActionHandler?()
     }
+    
+    
     
     func configureUI() {
         [textView].forEach {

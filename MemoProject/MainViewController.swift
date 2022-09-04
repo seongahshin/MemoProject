@@ -41,11 +41,11 @@ class ViewController: UIViewController {
         return view
     }()
     
-    var bottomView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .black
-        return view
-    }()
+//    var bottomView: UIView = {
+//        let view = UIView()
+//        view.backgroundColor = .black
+//        return view
+//    }()
     
     var writeButton: UIButton = {
         let view = UIButton()
@@ -71,13 +71,20 @@ class ViewController: UIViewController {
         numberFormatter.numberStyle = .decimal
         let memoCount = numberFormatter.string(for: self.localRealm.objects(MemoModel.self).count)!
         navigationItem.title = "\(String(describing: memoCount))개의 메모"
-//        self.navigationItem.titleView = searchBar
+        
+        self.navigationController?.isToolbarHidden = false
+        self.navigationController?.toolbar.backgroundColor = UIColor(named: "DarkMode")
+        var items = [UIBarButtonItem]()
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        items.append(flexibleSpace)
+        items.append(UIBarButtonItem(image: UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(writeButtonClicked)))
+        self.toolbarItems = items
         
         configureUI()
         tableView.dataSource = self
         tableView.delegate = self
         
-        writeButton.addTarget(self, action: #selector(writeButtonClicked), for: .touchUpInside)
+//        writeButton.addTarget(self, action: #selector(writeButtonClicked), for: .touchUpInside)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -144,7 +151,7 @@ class ViewController: UIViewController {
     
     func configureUI() {
 
-        [tableView, bottomView, writeButton].forEach {
+        [tableView].forEach {
             view.addSubview($0)
         }
         
@@ -152,17 +159,6 @@ class ViewController: UIViewController {
 
         tableView.snp.makeConstraints { make in
             make.top.left.right.bottom.equalToSuperview()
-        }
-        
-        bottomView.snp.makeConstraints { make in
-            make.left.right.bottom.equalTo(0)
-            make.height.equalTo(100)
-        }
-        
-        writeButton.snp.makeConstraints { make in
-            make.bottom.equalTo(-75)
-            make.trailingMargin.equalTo(-2)
-            make.height.width.equalTo(20)
         }
     }
     
