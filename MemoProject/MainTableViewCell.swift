@@ -12,19 +12,16 @@ class MainTableViewCell: UITableViewCell {
     
     var memoTitle: UILabel = {
         let view = UILabel()
-        view.backgroundColor = .white
         return view
     }()
     
     var memoDate: UILabel = {
         let view = UILabel()
-        view.backgroundColor = .white
         return view
     }()
     
     var memoText: UILabel = {
         let view = UILabel()
-        view.backgroundColor = .gray
         return view
     }()
     

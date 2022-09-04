@@ -60,16 +60,17 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        let searchBar = UISearchBar()
         searchBarDesign()
         tasks = localRealm.objects(MemoModel.self).filter("pinned == false").sorted(byKeyPath: "date", ascending: false)
         favoriteTasks = localRealm.objects(MemoModel.self).filter("pinned == true").sorted(byKeyPath: "date", ascending: false)
-//        allTasks = localRealm.objects(MemoModel.self).sorted(byKeyPath: "date", ascending: false)
 
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.largeTitleDisplayMode = .always
-        self.navigationController?.navigationItem.title = "0개의 메모"
-        self.navigationController?.navigationBar.backgroundColor = .red
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        let memoCount = numberFormatter.string(for: self.localRealm.objects(MemoModel.self).count)!
+        navigationItem.title = "\(String(describing: memoCount))개의 메모"
 //        self.navigationItem.titleView = searchBar
         
         configureUI()
@@ -80,7 +81,13 @@ class ViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-    
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        let memoCount = numberFormatter.string(for: self.localRealm.objects(MemoModel.self).count)!
+        navigationItem.title = "\(String(describing: memoCount))개의 메모"
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+        self.navigationItem.largeTitleDisplayMode = .always
         tableView.reloadData()
     }
     
@@ -129,6 +136,7 @@ class ViewController: UIViewController {
                 self.localRealm.add(task)
                 print(task)
                 self.tableView.reloadData()
+                self.viewWillAppear(false)
             }
         }
         self.navigationController?.pushViewController(vc, animated: true)
