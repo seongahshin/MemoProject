@@ -61,8 +61,8 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         searchBarDesign()
-        tasks = localRealm.objects(MemoModel.self).filter("pinned == false").sorted(byKeyPath: "date", ascending: false)
         favoriteTasks = localRealm.objects(MemoModel.self).filter("pinned == true").sorted(byKeyPath: "date", ascending: false)
+        tasks = localRealm.objects(MemoModel.self).filter("pinned == false").sorted(byKeyPath: "date", ascending: false)
 
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.largeTitleDisplayMode = .always
@@ -241,6 +241,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             cell.memoTitle.text = row.title
             cell.memoText.text = row.content
             cell.memoDate.text = "\(row.date)"
+            
             return cell
         } else {
             print(#function)

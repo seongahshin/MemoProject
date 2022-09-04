@@ -20,6 +20,7 @@ class WriteViewController: UIViewController, UITextViewDelegate {
     
     var textView: UITextView = {
         let view = UITextView()
+      
         return view
     }()
     
@@ -31,10 +32,23 @@ class WriteViewController: UIViewController, UITextViewDelegate {
         
     }
     
+    @objc func rightsecondbarButtonItemClicked() {
+        let shareText: String = "메모를 공유해보세요"
+        var shareObject = [Any]()
+        shareObject.append(textView.text!)
+        
+        let activityViewController = UIActivityViewController(activityItems : shareObject, applicationActivities: nil)
+        activityViewController.popoverPresentationController?.sourceView = self.view
+        self.present(activityViewController, animated: true)
+    }
+    
     override func viewDidLoad() {
         self.navigationController?.navigationBar.prefersLargeTitles = true
+       
         self.navigationItem.largeTitleDisplayMode = .always
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(rightbarButtonItemClicked))
+        let doneButtonItem = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(rightbarButtonItemClicked))
+        let shareBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "square.and.arrow.up"), style: .done, target: self, action: #selector(rightsecondbarButtonItemClicked))
+        navigationItem.rightBarButtonItems = [doneButtonItem, shareBarButtonItem]
         configureUI()
         textView.delegate = self
         textView.text = contextAll
@@ -50,7 +64,8 @@ class WriteViewController: UIViewController, UITextViewDelegate {
         }
         
         textView.snp.makeConstraints { make in
-            make.top.left.right.bottom.equalTo(0)
+            make.left.right.bottom.equalTo(0)
+            make.top.equalToSuperview()
         }
     }
     

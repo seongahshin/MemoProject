@@ -76,8 +76,8 @@
 				8CC8A24D28BF545800579FFC /* Assets.xcassets */,
 				8CC8A25228BF545800579FFC /* Info.plist */,
 				8CC8A25E28BF617200579FFC /* WriteViewController.swift */,
-				8CC8A26328BF6E2500579FFC /* MainTableViewCell.swift */,
 				8CC8A26C28C0F38E00579FFC /* MemoModel.swift */,
+				8CC8A26328BF6E2500579FFC /* MainTableViewCell.swift */,
 			);
 			path = MemoProject;
 			sourceTree = "<group>";
