@@ -271,7 +271,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50
+        return 60
     }
     
     func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
@@ -346,6 +346,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 
             try! self.localRealm.write {
                 self.localRealm.delete(row)
+                self.memoCountTitle()
                 print(Realm.Configuration.defaultConfiguration.fileURL!)
                 print(self.favoriteTasks!)
                 tableView.reloadData()
@@ -361,7 +362,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "WriteViewController") as? WriteViewController else { return }
         var taskUpdate = tasks[indexPath.row]
         
-        // 여기서(고정된 메모)를 select하면 앱이 꺼지는데, 어떻게 해결해야할지를 모르겠어요 ...
+        // 여기서(고정된 메모)를 select하면 앱이 꺼지는데, 어떻게 해결해야할지를 모르겠어요 ... 고정이랑 삭제는 잘 되는데 ..
         if indexPath.section == 0 {
             taskUpdate = isFiltering() ? allTasks[indexPath.row] : favoriteTasks[indexPath.row]
             print(favoriteTasks)

@@ -41,20 +41,20 @@ class MainTableViewCell: UITableViewCell {
         memoTitle.snp.makeConstraints { make in
             make.leadingMargin.equalTo(5)
             make.trailingMargin.equalTo(-5)
-            make.top.equalTo(5)
+            make.top.equalTo(10)
             make.height.equalTo(25)
         }
         
         memoDate.snp.makeConstraints { make in
             make.leadingMargin.equalTo(5)
-            make.bottom.equalTo(-2)
+            make.bottom.equalTo(-10)
             make.height.equalTo(15)
-            make.width.equalTo(150)
+            make.width.equalTo(130)
         }
         
         memoText.snp.makeConstraints { make in
             make.leadingMargin.equalTo(memoDate.snp.trailingMargin).offset(5)
-            make.bottom.equalTo(-2)
+            make.bottom.equalTo(-10)
             make.height.equalTo(15)
             make.trailingMargin.equalTo(-5)
             
