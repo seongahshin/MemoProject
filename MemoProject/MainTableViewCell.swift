@@ -49,7 +49,7 @@ class MainTableViewCell: UITableViewCell {
             make.leadingMargin.equalTo(5)
             make.bottom.equalTo(-2)
             make.height.equalTo(15)
-            make.width.equalTo(100)
+            make.width.equalTo(150)
         }
         
         memoText.snp.makeConstraints { make in

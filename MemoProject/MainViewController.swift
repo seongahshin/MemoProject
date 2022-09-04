@@ -368,22 +368,23 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
         vc.contextAll = taskUpdate.rawContent
-        vc.backActionHandler = {
+        vc.backActionHandler = { [self] in
             
             var title = ""
             var content = ""
             
-            try! self.localRealm.write {
-                taskUpdate.title = title
-                taskUpdate.content = content
-                taskUpdate.rawContent = vc.textView.text
-                taskUpdate.date = self.dateCalculate(date: Date())
-                
-                self.tableView.reloadData()
-            }
             
             // 공백
             if vc.textView.text!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                try! self.localRealm.write {
+                    taskUpdate.title = title
+                    taskUpdate.content = content
+                    taskUpdate.rawContent = vc.textView.text
+                    taskUpdate.date = self.dateCalculate(date: Date())
+                    
+                    self.tableView.reloadData()
+                }
+                
                 try! self.localRealm.write {
                     self.localRealm.delete(taskUpdate)
                     tableView.reloadData()
@@ -399,13 +400,30 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             // 한줄
             else if !vc.textView.text!.contains("\n") {
                 title = vc.textView.text!
+                try! self.localRealm.write {
+                    taskUpdate.title = title
+                    taskUpdate.content = content
+                    taskUpdate.rawContent = vc.textView.text
+                    taskUpdate.date = self.dateCalculate(date: Date())
+                    
+                    self.tableView.reloadData()
+                }
             }
             
             // 개행
             else {
                 title = String(vc.textView.text!.split(separator: "\n").first!)
                 content = String(vc.textView.text.dropFirst(title.count+1))
+                try! self.localRealm.write {
+                    taskUpdate.title = title
+                    taskUpdate.content = content
+                    taskUpdate.rawContent = vc.textView.text
+                    taskUpdate.date = self.dateCalculate(date: Date())
+                    
+                    self.tableView.reloadData()
+                }
             }
+            
             
             
         }
