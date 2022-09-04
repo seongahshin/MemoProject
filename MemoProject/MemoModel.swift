@@ -13,13 +13,13 @@ class MemoModel: Object {
     @Persisted var title: String
     @Persisted var content: String?
     @Persisted var rawContent: String
-    @Persisted var date = Date()
+    @Persisted var date: String
     @Persisted var pinned: Bool
 //    @Persisted var clicked = false
     
     @Persisted(primaryKey: true) var objectId: ObjectId
     
-    convenience init(title: String, content: String, rawContent: String, date: Date, pinned: Bool) {
+    convenience init(title: String, content: String, rawContent: String, date: String, pinned: Bool) {
         self.init()
         self.title = title
         self.content = content

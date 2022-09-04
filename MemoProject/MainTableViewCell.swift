@@ -12,16 +12,19 @@ class MainTableViewCell: UITableViewCell {
     
     var memoTitle: UILabel = {
         let view = UILabel()
+        view.font = UIFont.boldSystemFont(ofSize: 15)
         return view
     }()
     
     var memoDate: UILabel = {
         let view = UILabel()
+        view.font = UIFont.systemFont(ofSize: 11)
         return view
     }()
     
     var memoText: UILabel = {
         let view = UILabel()
+        view.font = UIFont.systemFont(ofSize: 11)
         return view
     }()
     

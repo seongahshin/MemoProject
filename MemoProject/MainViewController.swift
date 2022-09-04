@@ -42,12 +42,6 @@ class ViewController: UIViewController {
         return view
     }()
     
-//    var bottomView: UIView = {
-//        let view = UIView()
-//        view.backgroundColor = .black
-//        return view
-//    }()
-    
     var writeButton: UIButton = {
         let view = UIButton()
         view.setImage(UIImage(systemName: "square.and.pencil"), for: .normal)
@@ -123,7 +117,7 @@ class ViewController: UIViewController {
 
         guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "WriteViewController") as? WriteViewController else { return }
         
-        vc.backActionHandler = {
+        vc.backActionHandler = { [self] in
             var title = ""
             var content = ""
             
@@ -146,7 +140,9 @@ class ViewController: UIViewController {
                 
             }
             
-            let task = MemoModel(title: title, content: content, rawContent: vc.textView.text, date: Date(), pinned: false)
+            
+            
+            let task = MemoModel(title: title, content: content, rawContent: vc.textView.text, date: self.dateCalculate(date: Date()), pinned: false)
             
             try! self.localRealm.write {
                 self.localRealm.add(task)
@@ -156,6 +152,15 @@ class ViewController: UIViewController {
             }
         }
         self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func dateCalculate(date: Date) -> String {
+        let today = date
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_kr")
+        formatter.timeZone = TimeZone(abbreviation: "KST")
+        formatter.dateFormat = "yyyy.MM.dd a hh:mm"
+        return formatter.string(from: today)
     }
     
     func configureUI() {
@@ -217,7 +222,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 
         if section == 0 {
-            return isFiltering() ? "검색" : "고정된 메모"
+            return isFiltering() ? "\(allTasks.count)개 찾음" : "고정된 메모"
         } else {
             return "메모"
         }
@@ -372,7 +377,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
                 taskUpdate.title = title
                 taskUpdate.content = content
                 taskUpdate.rawContent = vc.textView.text
-                taskUpdate.date = Date()
+                taskUpdate.date = self.dateCalculate(date: Date())
                 
                 self.tableView.reloadData()
             }
