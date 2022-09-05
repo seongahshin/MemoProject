@@ -142,9 +142,8 @@ class ViewController: UIViewController {
             // 개행 있을 경우
             else {
                 
-                let result = vc.textView.text.split(separator: "\n", maxSplits: 2)
-                title = String(vc.textView.text!.split(separator: "\n").first!)
-                content = "\(result[1])"
+                title = String(vc.textView.text!.split(separator: "\n").first!) //첫번째 줄만
+                content = String(vc.textView.text!.dropFirst(title.count+1)) // 제목 자르고 넣음
                 
             }
             
@@ -163,11 +162,12 @@ class ViewController: UIViewController {
     }
     
     func dateCalculate(date: Date) -> String {
+        
         let today = date
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_kr")
         formatter.timeZone = TimeZone(abbreviation: "KST")
-        formatter.dateFormat = "yyyy.MM.dd a hh:mm"
+        formatter.dateFormat = "a hh:mm"
         return formatter.string(from: today)
     }
     
