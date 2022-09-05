@@ -80,6 +80,10 @@ class ViewController: UIViewController {
         
         configureUI()
         
+        // 헤더
+        tableView.register(UITableViewHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: "customHeader")
+        
+        
         tableView.dataSource = self
         tableView.delegate = self
         
@@ -223,14 +227,33 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         return isFiltering() ? 1 : 2
     }
     
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "customHeader")
+        let textLabel = UILabel()
+        header?.addSubview(textLabel)
+        
         if section == 0 {
-            return isFiltering() ? "\(allTasks.count)개 찾음" : "고정된 메모"
+            header?.textLabel?.text = isFiltering() ? "\(allTasks.count)개 찾음" : "고정된 메모"
         } else {
-            return "메모"
+            header?.textLabel?.text = "메모"
         }
+        
+        header?.textLabel?.font = UIFont.boldSystemFont(ofSize: 20)
+        header?.textLabel?.textColor = UIColor(named: "TextColor")
+        return header
     }
+    
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        guard let header = view as? UITableViewHeaderFooterView else { return }
+                
+            let view: UIView = {
+                let v = UIView(frame: .zero)
+                return v
+            }()
+                
+            header.backgroundView = view
+    }
+    
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
@@ -419,9 +442,8 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         var taskUpdate = tasks[indexPath.row]
         
         // 여기서(고정된 메모)를 select하면 앱이 꺼지는데, 어떻게 해결해야할지를 모르겠어요 ...
-        if indexPath.section == 0 {
+        if indexPath.section == 0 && !searchController.isActive {
             taskUpdate = isFiltering() ? allTasks[indexPath.row] : favoriteTasks[indexPath.row]
-            print(favoriteTasks)
         }
         
         vc.contextAll = taskUpdate.rawContent
