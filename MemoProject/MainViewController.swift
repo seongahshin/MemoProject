@@ -54,7 +54,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        onBoarding()
         searchBarDesign()
         favoriteTasks = localRealm.objects(MemoModel.self).filter("pinned == true").sorted(byKeyPath: "date", ascending: false)
         tasks = localRealm.objects(MemoModel.self).filter("pinned == false").sorted(byKeyPath: "date", ascending: false)
@@ -192,6 +192,14 @@ class ViewController: UIViewController {
     func isFiltering() -> Bool {
      
         return searchController.isActive && !searchBarIsEmpty()
+    }
+    
+    func onBoarding() {
+        if UserDefaults.standard.object(forKey: "first") == nil {
+            guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "WalkthroughViewController") as? WalkthroughViewController else { return }
+            vc.modalPresentationStyle = .overFullScreen
+            self.present(vc, animated: true)
+        }
     }
 
 }

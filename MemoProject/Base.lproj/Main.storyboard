@@ -39,6 +39,21 @@
             </objects>
             <point key="canvasLocation" x="1600.0000000000002" y="85.714285714285708"/>
         </scene>
+        <!--Walkthrough View Controller-->
+        <scene sceneID="hFb-ce-V41">
+            <objects>
+                <viewController storyboardIdentifier="WalkthroughViewController" id="fHB-y4-g5N" customClass="WalkthroughViewController" customModule="MemoProject" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="dZi-6T-DY3">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="XXg-xD-SMC"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="pxl-yk-i7o" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2343" y="86"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="M3j-qh-vNC">
             <objects>
