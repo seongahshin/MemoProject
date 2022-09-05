@@ -58,15 +58,18 @@ class ViewController: UIViewController {
         searchBarDesign()
         favoriteTasks = localRealm.objects(MemoModel.self).filter("pinned == true").sorted(byKeyPath: "date", ascending: false)
         tasks = localRealm.objects(MemoModel.self).filter("pinned == false").sorted(byKeyPath: "date", ascending: false)
-
+        
+        // 네비바
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.largeTitleDisplayMode = .always
         
+        // 메모 개수
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         let memoCount = numberFormatter.string(for: self.localRealm.objects(MemoModel.self).count)!
         navigationItem.title = "\(String(describing: memoCount))개의 메모"
         
+        // 툴바
         self.navigationController?.isToolbarHidden = false
         self.navigationController?.toolbar.backgroundColor = UIColor(named: "DarkMode")
         var items = [UIBarButtonItem]()
@@ -76,6 +79,7 @@ class ViewController: UIViewController {
         self.toolbarItems = items
         
         configureUI()
+        
         tableView.dataSource = self
         tableView.delegate = self
         
@@ -334,6 +338,58 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        if indexPath.section == 0 && !searchController.isActive {
+            let delete = UIContextualAction(style: .normal, title: "") { [self] action, view, completionHandler in
+                completionHandler(true)
+                var row = isFiltering() ? allTasks[indexPath.row] : favoriteTasks[indexPath.row]
+                try! self.localRealm.write {
+                    self.localRealm.delete(row)
+                    self.memoCountTitle()
+                    print(Realm.Configuration.defaultConfiguration.fileURL!)
+                    print(self.favoriteTasks!)
+                    tableView.reloadData()
+                }
+            }
+            delete.image = UIImage(systemName: "trash")
+            delete.backgroundColor = .red
+            let config = UISwipeActionsConfiguration(actions: [delete])
+            return config
+        } else if indexPath.section == 1 {
+            let delete = UIContextualAction(style: .normal, title: "") { [self] action, view, completionHandler in
+                completionHandler(true)
+                var row = tasks[indexPath.row]
+                try! self.localRealm.write {
+                    self.localRealm.delete(row)
+                    self.memoCountTitle()
+                    print(Realm.Configuration.defaultConfiguration.fileURL!)
+                    print(self.favoriteTasks!)
+                    tableView.reloadData()
+                }
+            }
+            delete.image = UIImage(systemName: "trash")
+            delete.backgroundColor = .red
+            let config = UISwipeActionsConfiguration(actions: [delete])
+            return config
+        } else {
+            let delete = UIContextualAction(style: .normal, title: "") { [self] action, view, completionHandler in
+                completionHandler(true)
+                var row = allTasks[indexPath.row]
+                try! self.localRealm.write {
+                    self.localRealm.delete(row)
+                    self.memoCountTitle()
+                    print(Realm.Configuration.defaultConfiguration.fileURL!)
+                    print(self.favoriteTasks!)
+                    tableView.reloadData()
+                }
+            }
+            delete.image = UIImage(systemName: "trash")
+            delete.backgroundColor = .red
+            let config = UISwipeActionsConfiguration(actions: [delete])
+            return config
+        }
+        
+        
         let delete = UIContextualAction(style: .normal, title: "") { [self] action, view, completionHandler in
             completionHandler(true)
 
@@ -362,7 +418,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "WriteViewController") as? WriteViewController else { return }
         var taskUpdate = tasks[indexPath.row]
         
-        // 여기서(고정된 메모)를 select하면 앱이 꺼지는데, 어떻게 해결해야할지를 모르겠어요 ... 고정이랑 삭제는 잘 되는데 ..
+        // 여기서(고정된 메모)를 select하면 앱이 꺼지는데, 어떻게 해결해야할지를 모르겠어요 ...
         if indexPath.section == 0 {
             taskUpdate = isFiltering() ? allTasks[indexPath.row] : favoriteTasks[indexPath.row]
             print(favoriteTasks)
